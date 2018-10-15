@@ -1,0 +1,73 @@
+#main_background{
+    background: #eee;
+    padding: 5px;
+    height: calc(100% - 10px);
+    width: calc(100% - 10px);
+}
+html {
+    height: 100%;
+  }
+body {
+    min-height: 100%;
+    height: 100%;
+    margin: 0px;
+}
+#gantt_cell_wrapper{
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: 100%;
+    width: 100%;
+}
+#timeline_wrapper{
+    width: 100%;
+    height: 100%;
+}
+#gantt_cells{
+    width: max-content;
+    border-collapse:collapse;
+}
+#timeline_box{
+    width: 100%;
+    height: 80px;
+    border: 1px solid gray;
+}
+.gantt-cell{
+    border: 1px solid black;
+}
+.gantt-cell-header{
+    border-bottom: 2px solid gray;
+}
+.gantt-indicator.gantt-cell{
+    border-left: none;
+}
+.localtable{
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+.remainderRow{
+    display: table-row;
+    width: 100%;
+}
+.remainderCell{
+    display: table-cell;
+    height: 100%;
+}
+.table-cell{
+    display: table-cell;
+}
+.table-row{
+    display: table-row;
+}
+.baseRelative{
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+.baseAbsolute{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}

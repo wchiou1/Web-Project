@@ -4,15 +4,15 @@ var cellHighlight = false;
 
 $(function(){
     defaultWidth = {
-        indicator: 50,
+        indicator: 30,
         taskMode: 80,
         taskName: 150,
-        duration: 40,
+        duration: 30,
         start: 150,
         finish: 150,
         prereq: 40
     };
-    defaultHeight = 25;
+    defaultHeight = 21;
     fillInGanttCels();
     initResize();
     initExcelEvents();
@@ -22,7 +22,7 @@ $(function(){
 function initExcelEvents(){
     //Get the mousedown
     //Handle mousemove
-    $("body").on("mouseover",handleCellOver);
+    $(".gantt-cell").on("mousemove",handleCellOver);
     $('.gantt-cell').on("mousedown",handleCellDown);
     $('body').on("mouseup",handleCellUp)
 }
@@ -31,22 +31,13 @@ function handleCellOver(e){
 
     //If the mouse is down over the cells, move the endHighlight
     if(cellHighlight){
-        //Need to calc where the mouse is relative to the grid
-    
-        //First get the x and y
-        var mouseX = e.clientX;
-        var mouseY = e.clientY;
-
-        //Get offset
-        var chartX = $("#gantt_cells").offset().left;
-        var chartY = $("#gantt_cells").offset().top;
 
         //Find the col
-        var col = getCol(mouseX-chartX);
+        var col = $(e.target).attr('col');
 
         //Find the row
-        var row = getRow(mouseY-chartY);
-
+        var row = $(e.target).closest('.gantt-row').attr('row');
+        
         endHighlight.col = col;
         endHighlight.row = row;
 
@@ -114,7 +105,6 @@ function scrollToCell(col,row){
 }
 
 function activateCell(col,row){
-    console.log("Activating cell "+col+","+row);
     var cell = $('.gantt-row[row='+row+']').find('.gantt-cell[col='+col+']');
     var width = cell.width();
     if(cell.hasClass('input-date')){
@@ -126,12 +116,13 @@ function activateCell(col,row){
     else if(cell.hasClass('input-number')){
         activateInputNumber();
     }
+    cell.find('input').focus();
     function activateInputNumber(){
         //First check if the input already exists
         if(cell.find("input").length==0){
             //Insert or destroy the input
             cell.append($(`
-                <input type="number" class="transparent" style="width:`+width+`px"></input>
+                <input type="number" class="transparent" style="max-width:`+width+`px"></input>
             `));
         }
         else{
@@ -143,7 +134,7 @@ function activateCell(col,row){
         if(cell.find("input").length==0){
             //Insert or destroy the input
             cell.append($(`
-                <input type="text" class="transparent" style="width:`+width+`px"></input>
+                <input type="text" class="transparent" style="max-width:`+width+`px"></input>
             `));
         }
         else{
@@ -154,7 +145,7 @@ function activateCell(col,row){
         //First check if the input already exists
         if(cell.find("input").length==0){
             //Insert or destroy the input
-            var datepicker = $(`<input type="date" class="transparent" style="width:`+width+`px"></input>`);
+            var datepicker = $(`<input type="date" class="transparent" style="max-width:`+width+`px"></input>`);
             cell.append(datepicker);
         }
         else{
@@ -162,7 +153,6 @@ function activateCell(col,row){
         }
     }
 }
-
 function handleCellUp(){
     //If the same cell is highlighted, activate it
     if(cellHighlight&&startHighlight.col == endHighlight.col
@@ -173,14 +163,13 @@ function handleCellUp(){
 }
 
 function handleCellDown(e){
-
+    console.log(e);
     //check the current startHighlight if it needs to be cleared
 
 
     //Gonna leave that there, but let's get the cell number instead
     var col = $(e.currentTarget).attr('col');
     var row = $(e.currentTarget).closest(".gantt-row").attr('row');
-    console.log(col+","+row);
     //If it's NOT the same cell that as clicked
     if(startHighlight.col != col
         ||startHighlight.row != row){
@@ -243,6 +232,25 @@ function initResize(){
     $('#gantt_table_cell_wrapper').resizable({
         handles: "e, s, w"
       });
+    $('.gantt-cell-header').resizable({
+        handles: "e",
+        resize: function(e){
+            if($(e.target).hasClass('input-date')){
+                //We want to resize all the inputs
+                var col = $(e.target).attr('col');
+                var style = $(e.target).attr("style");
+                var width = style.split("width: ")[1].split(";")[0];
+                $('.gantt-cell[col='+col+'] input')
+                    .css("max-width",width);
+            }
+            else{
+                var col = $(e.target).attr('col');
+                var width = $(e.target).width();
+                $('.gantt-cell[col='+col+'] input')
+                    .css("max-width",width);
+            }
+        }
+    });
 }
 
 function fillInGanttCels(){
@@ -254,11 +262,11 @@ function fillInGanttCels(){
         <div class="no-select gantt-row gantt-row-header table-row" row=`+i+` style="height:`+defaultHeight+`px">
             <div class="no-select gantt-indicator gantt-cell-header table-cell" col=0 style="width:`+defaultWidth.indicator+`px;"><span>I</span></div>
             <div class="no-select gantt-taskmode gantt-cell-header table-cell" col=1 style="width:`+defaultWidth.taskMode+`px;">Task Mode</div>
-            <div class="no-select gantt-taskname gantt-cell-header table-cell" col=2 style="width:`+defaultWidth.taskName+`px;">Task Name</div>
-            <div class="no-select gantt-duration gantt-cell-header table-cell" col=3 style="width:`+defaultWidth.duration+`px;">Duration</div>
-            <div class="no-select gantt-start gantt-cell-header table-cell" col=4 style="width:`+defaultWidth.start+`px;">Start</div>
-            <div class="no-select gantt-end gantt-cell-header table-cell" col=5 style="width:`+defaultWidth.finish+`px;">Finish</div>
-            <div class="no-select gantt-prereq gantt-cell-header table-cell" col=6 style="width:`+defaultWidth.prereq+`px;">PreReq</div>
+            <div class="no-select input-text gantt-taskname gantt-cell-header table-cell" col=2 style="width:`+defaultWidth.taskName+`px;">Task Name</div>
+            <div class="no-select input-number gantt-duration gantt-cell-header table-cell" col=3 style="width:`+defaultWidth.duration+`px;">Duration</div>
+            <div class="no-select input-date gantt-start gantt-cell-header table-cell" col=4 style="width:`+defaultWidth.start+`px;">Start</div>
+            <div class="no-select input-date gantt-end gantt-cell-header table-cell" col=5 style="width:`+defaultWidth.finish+`px;">Finish</div>
+            <div class="no-select input-number gantt-prereq gantt-cell-header table-cell" col=6 style="width:`+defaultWidth.prereq+`px;">PreReq</div>
         </div>
     `);
     $("#gantt_cells").append(row);

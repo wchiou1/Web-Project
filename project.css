@@ -37,7 +37,12 @@ body {
     border-collapse:collapse;
     cursor: cell;
 }
-
+.gantt-cell input[type="date"]{
+    min-width: 64px;
+}
+.gantt-cell input{
+    min-width: 0px;
+}
 #timeline_box{
     width: calc(100% - 10px);
     height: 80px;
@@ -56,6 +61,7 @@ body {
 }
 .gantt-cell{
     border: 1px solid black;
+    box-sizing: border-box;
 }
 .gantt-cell input{
     height: 100%;
@@ -63,8 +69,8 @@ body {
     border: none;
 }
 .gantt-cell-header{
-    border: 2px solid gray;
-    border-bottom: none;
+    border: 1px solid gray;
+    border-bottom: 2px solid gray;
 }
 .gantt-indicator.gantt-cell{
     /*order-left: none;*/

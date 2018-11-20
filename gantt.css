@@ -1,0 +1,42 @@
+#gantt_chart_wrapper{
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: calc(100% - 10px);
+    width: calc(100% - 10px);
+    margin: 5px;
+    border: 1px #b9b9b9 solid;
+    box-shadow: 2px 2px 6px #c1c1c1
+}
+#gantt_chart{
+    border-collapse: collapse;
+    width: max-content;
+}
+.gantt-chart-row-body{
+    border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+}
+.gantt-chart-cell-header{
+    border: 1px #b9b9b9 solid;
+    border-top: none;
+    background: #e0e0e0;
+    font-family: sans-serif;
+    font-size: 9px;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.gantt-chart-weekend{
+    background: rgba(195, 195, 195, 0.20);
+    position: relative;
+}
+.gantt-chart-weekend.sunday:after{
+    display:block;
+    content:".";
+    color:transparent;
+    font-size:0;
+    border-left:1px solid #eee;
+    position:absolute;
+    left:0px;
+    top:0px;
+    bottom:0px;
+}

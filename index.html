@@ -8,6 +8,7 @@
   <script src="jquery-ui.min.js"></script>
   
   <link href="project.css" rel="stylesheet">
+  <link href="gantt.css" rel="stylesheet">
   <link href="jquery-ui.min.css" rel="stylesheet">
 
   </head>
@@ -35,9 +36,15 @@
                 </div>
               </div>
             
-              <div class="remainderCell">
-                <div id="gantt_chart_wrapper" class="localtable">
+              <div id="gantt_chart_cell_wrapper" class="remainderCell">
+                <div id="gantt_chart_wrapper">
+                  <div class="baseRelative">
+                    <div class="baseAbsolute">
+                      <div id="gantt_chart" class="no-select localtable">
 
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -47,5 +54,8 @@
     </div>
   </body>
   
+  <script src="functions.js" type="text/javascript"></script>
+  
   <script src="main.js" type="text/javascript"></script>
+  <script src="gantt.js" type="text/javascript"></script>
 </html>

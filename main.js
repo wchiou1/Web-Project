@@ -33,10 +33,10 @@ function handleCellOver(e){
     if(cellHighlight){
 
         //Find the col
-        var col = $(e.target).attr('col');
+        var col = $(e.currentTarget).attr('col');
 
         //Find the row
-        var row = $(e.target).closest('.gantt-row').attr('row');
+        var row = $(e.currentTarget).closest('.gantt-row').attr('row');
         
         endHighlight.col = col;
         endHighlight.row = row;
@@ -109,12 +109,14 @@ function activateCell(col,row){
     var width = cell.width();
     if(cell.hasClass('input-date')){
         activateInputDate();
+        revalidateDateInput();
     }
     else if(cell.hasClass('input-text')){
         activateInputText();
     }
     else if(cell.hasClass('input-number')){
         activateInputNumber();
+        revalidateDurInput();
     }
     cell.find('input').focus();
     function activateInputNumber(){
@@ -122,11 +124,11 @@ function activateCell(col,row){
         if(cell.find("input").length==0){
             //Insert or destroy the input
             cell.append($(`
-                <input type="number" class="transparent" style="max-width:`+width+`px"></input>
+                <input type="number" class="transparent" min="1" style="max-width:`+width+`px"></input>
             `));
         }
         else{
-            console.log(cell.find('input').val());
+            //console.log(cell.find('input').val());
         }
     }
     function activateInputText(){
@@ -146,7 +148,14 @@ function activateCell(col,row){
         if(cell.find("input").length==0){
             //Insert or destroy the input
             var datepicker = $(`<input type="date" class="transparent" style="max-width:`+width+`px"></input>`);
+            var row = cell.closest('.gantt-row')
             cell.append(datepicker);
+            if(cell.hasClass('gantt-start')){
+                revalidateStartDate(row);
+            }
+            else if(cell.hasClass('gantt-end')){
+                revalidateEndDate(row);
+            }
         }
         else{
             console.log(cell.find('input').val());
@@ -163,7 +172,6 @@ function handleCellUp(){
 }
 
 function handleCellDown(e){
-    console.log(e);
     //check the current startHighlight if it needs to be cleared
 
 
@@ -228,9 +236,138 @@ function refreshCellHighlight(){
 
 }
 
+function revalidateDurInput(){
+    $('.gantt-duration input')
+        .off('change')
+        .on('change',revalOnChange);
+    function revalOnChange(e){
+        var row = $(this).closest('.gantt-row');
+        revalidateDuration(row);
+    }
+}
+
+function revalidateDateInput(){
+    $('.input-date input').off('change');
+    $('.input-date input').on('change',revalOnChange);
+    function revalOnChange(e){
+        //Identify finish or start
+        var cell = $(this).closest('.gantt-cell');
+        var row = $(this).closest('.gantt-row');
+        if(cell.hasClass('gantt-start')){
+            revalidateStartDate(row);
+        }
+        if(cell.hasClass('gantt-end')){
+            revalidateEndDate(row);
+        }
+    }
+}
+
+function revalidateEndDate(row){
+    var end_input = row.find('.gantt-end input');
+    if(end_input.length==0||end_input.val().length==0){
+        //Nothing to revalidate if the input doesn't exist
+        return;
+    }
+    var start_input = row.find('.gantt-start input');
+    var dur_input = row.find('.gantt-duration input');
+    if(start_input.length==0&&dur_input.length==0){
+        return;
+    }
+    //If start exists
+    if(start_input.length!=0){
+        var startDate = new Date(start_input.val());
+        var endDate = new Date(end_input.val());
+        var timeDiff = endDate.getTime() - startDate.getTime();
+        var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
+        if(diffDays<=0){
+            //The finish is before start
+            start_input.val(end_input.val());
+            dur_input.val("1");
+        }
+        else{
+            dur_input.val(diffDays+1);
+        }
+        return;
+    }
+    //If duration exists
+    if(dur_input.length!=0){
+        var endDate = new Date(end_input.val());
+        endDate = endDate.addDays(-1*(parseInt(dur_input.val())+1));
+        var r = row.attr('row');
+        var c = row.find('.gantt-start').attr('col');
+        activateCell(c,r);
+        var start_input = row.find('.gantt-start input');
+        start_input.val(dateToInput(endDate));
+    }
+}
+//Which ever one is revalidated will stay the same
+function revalidateStartDate(row){
+    var start_input = row.find('.gantt-start input');
+    if(start_input.length==0||start_input.val().length==0){
+        //Nothing to revalidate if the input doesn't exist
+        return;
+    }
+    var end_input = row.find('.gantt-end input');
+    var dur_input = row.find('.gantt-duration input');
+    if(end_input.length==0&&dur_input.length==0){
+        return;
+    }
+    //If duration exists
+    if(dur_input.length!=0){
+        var startDate = new Date(start_input.val());
+        startDate = startDate.addDays((parseInt(dur_input.val())-1));
+        var r = row.attr('row');
+        var c = row.find('.gantt-end').attr('col');
+        activateCell(c,r);
+        var end_input = row.find('.gantt-end input');
+        end_input.val(dateToInput(startDate));
+        return;
+    }
+    //If end exists
+    if(end_input.length!=0){
+        var startDate = new Date(start_input.val());
+        var endDate = new Date(end_input.val());
+        var timeDiff = endDate.getTime() - startDate.getTime();
+        var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
+        dur_input.val(diffDays+1);
+    }
+    
+}
+function revalidateDuration(row){
+    var dur_input = row.find('.gantt-duration input');
+    if(dur_input.length==0||dur_input.val().length==0){
+        //Nothing to revalidate if the input doesn't exist
+        return;
+    }
+    var start_input = row.find('.gantt-start input');
+    var end_input = row.find('.gantt-end input');
+    if(start_input.length==0&&end_input.length==0){
+        return;
+    }
+    //Prioritize start date
+    if(start_input.length!=0){
+        var startDate = new Date(start_input.val());
+        startDate = startDate.addDays((parseInt(dur_input.val())-1));
+        var r = row.attr('row');
+        var c = row.find('.gantt-end').attr('col');
+        activateCell(c,r);
+        var end_input = row.find('.gantt-end input');
+        end_input.val(dateToInput(startDate));
+        return;
+    }
+    if(end_input.length!=0){
+        var endDate = new Date(end_input.val());
+        endDate = endDate.addDays(-1*(parseInt(dur_input.val())+1));
+        var r = row.attr('row');
+        var c = row.find('.gantt-start').attr('col');
+        activateCell(c,r);
+        var start_input = row.find('.gantt-start input');
+        start_input.val(dateToInput(endDate));
+    }
+}
 function initResize(){
     $('#gantt_table_cell_wrapper').resizable({
-        handles: "e, s, w"
+        handles: "e"
       });
     $('.gantt-cell-header').resizable({
         handles: "e",

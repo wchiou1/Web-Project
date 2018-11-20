@@ -1,0 +1,2 @@
+dislike current date limit
+change to modify and use duration to determine start and end

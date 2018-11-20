@@ -18,15 +18,8 @@ body {
     height: calc(100% - 10px);
     width: calc(100% - 10px);
     margin: 5px;
-    border: 1px black solid;
-}
-#gantt_chart_wrapper{
-    overflow-x: auto;
-    overflow-y: hidden;
-    height: calc(100% - 10px);
-    width: calc(100% - 10px);
-    margin: 5px;
-    border: 1px black solid;
+    border: 1px #b9b9b9 solid;
+    box-shadow: 2px 2px 6px #c1c1c1
 }
 #timeline_wrapper{
     width: 100%;
@@ -39,9 +32,6 @@ body {
 }
 .gantt-cell input[type="date"]{
     min-width: 64px;
-}
-.gantt-cell input{
-    min-width: 0px;
 }
 #timeline_box{
     width: calc(100% - 10px);
@@ -60,21 +50,35 @@ body {
     user-select: none;
 }
 .gantt-cell{
-    border: 1px solid black;
+    border: 1px #b9b9b9 solid;
     box-sizing: border-box;
+}
+.gantt-cell.error{
+    
 }
 .gantt-cell input{
     height: 100%;
     width: 100%;
+    min-width: 0px;
+    font-family: sans-serif;
+    font-size: 11px;
+    font-weight: bold;
     border: none;
 }
 .gantt-cell-header{
-    border: 1px solid gray;
-    border-bottom: 2px solid gray;
+    padding: 4px;
+    border: 1px #b9b9b9 solid;
+    border-top: none;
+    background: #e0e0e0;
+    font-family: sans-serif;
+    font-weight: bold;
+    font-size: 12px;
+    vertical-align: middle;
 }
 .gantt-indicator.gantt-cell{
     /*order-left: none;*/
 }
+
 .transparent{
     background: rgba(0,0,0,0);
 }

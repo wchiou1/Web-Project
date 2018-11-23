@@ -1,8 +1,12 @@
 var week = ["S","M","T","W","T","F","S"];
 Date.prototype.addDays = function(days) {
-    console.log(days);
     var date = new Date(this.valueOf());
-    date.setDate(date.getDate() + days);
+    date.setUTCDate(date.getUTCDate() + days);
+    return date;
+}
+Date.prototype.getWeekStart = function(){
+    var date = new Date(this.valueOf());
+    date.setUTCDate(date.getUTCDate() - date.getUTCDay());
     return date;
 }
 function dateToInput(date){
@@ -19,4 +23,11 @@ function reflow( element ) {
         element = document.documentElement;
     }
     void( element.offsetHeight );
+}
+function daysDiff(start,end){
+    var startDate = new Date(start);
+    var endDate = new Date(end);
+    var timeDiff = endDate.getTime() - startDate.getTime();
+    var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
+    return diffDays;
 }

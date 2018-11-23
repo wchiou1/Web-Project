@@ -4,7 +4,7 @@
     height: calc(100% - 10px);
     width: calc(100% - 10px);
     margin: 5px;
-    border: 1px #b9b9b9 solid;
+    border: .1em #b9b9b9 solid;
     box-shadow: 2px 2px 6px #c1c1c1
 }
 #gantt_chart{
@@ -17,26 +17,58 @@
 .gantt-chart-cell-header{
     border: 1px #b9b9b9 solid;
     border-top: none;
+    border-left: none;
     background: #e0e0e0;
     font-family: sans-serif;
     font-size: 9px;
     font-weight: bold;
     text-align: center;
     vertical-align: middle;
+    box-sizing: border-box;
 }
 
 .gantt-chart-weekend{
     background: rgba(195, 195, 195, 0.20);
     position: relative;
 }
-.gantt-chart-weekend.sunday:after{
+.gantt-cell-white-separator:after{
     display:block;
     content:".";
     color:transparent;
     font-size:0;
-    border-left:1px solid #eee;
+    border-right:1px solid #eee;
     position:absolute;
-    left:0px;
+    right:0px;
     top:0px;
     bottom:0px;
+}
+.gantt-chart-header-label{
+    border-right: 1px #b9b9b9 solid;
+    font-family: sans-serif;
+    font-size: 10px;
+    line-height: 13px;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+}
+#gantt_chart_label_wrapper{
+    padding-left: 1px;
+    background: #e0e0e0;
+}
+#gantt_chart .date-marker{
+    background: rgba(255,0,0,.2);
+    width: 1px;
+    height: 10000px;
+    position: absolute;
+}
+#gantt_chart .gantt-bar{
+    position: absolute;
+    z-index: 300;
+    width: 60px;
+    margin-top: 4px;
+    height: 16px;
+    box-sizing: border-box;
+    background: rgba(146, 146, 197, 0.75);
+    border-radius: 2px;
+    border: 1px solid rgba(120, 120, 181, 0.75);
 }

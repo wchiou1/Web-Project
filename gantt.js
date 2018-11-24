@@ -46,7 +46,7 @@ function updateGanttBar(row){
 
 function markLine(date){
     var date_string = dateToInput(date);
-    var hours = date.getUTCHours();
+    var hours = date.getHours();
     var pos = hours/24*gantt_chart_cell_width;
     var marker = $(`<div class="date-marker"></div>`);
     marker.css("margin-left",pos+"px");

@@ -1,6 +1,7 @@
 var startHighlight = {col:0,row:0};
 var endHighlight = {col:0,row:0};
 var cellHighlight = false;
+var cellScrolling = false;
 
 $(function(){
     defaultWidth = {
@@ -22,44 +23,137 @@ $(function(){
 function initExcelEvents(){
     //Get the mousedown
     //Handle mousemove
-    $(".gantt-cell").on("mousemove",handleCellOver);
+    $(window).on("mousemove",handleCellOver);
     $('.gantt-cell').on("mousedown",handleCellDown);
-    $('body').on("mouseup",handleCellUp)
+    $(window).on("mouseup",handleCellUp);
+    
+
 }
 
 function handleCellOver(e){
+    //console.log(cellHighlight);
+    var clientX = e.clientX;
+    var clientY = e.clientY;
 
     //If the mouse is down over the cells, move the endHighlight
     if(cellHighlight){
-
-        //Find the col
-        var col = $(e.currentTarget).attr('col');
-
-        //Find the row
-        var row = $(e.currentTarget).closest('.gantt-row').attr('row');
         
+        //CANNOT USE e.currentTarget, need to use math
+        
+            //Get the 
+        var offset = $('.gantt-row[row=0]').offset();
+        var startx = offset.left;
+        var starty = offset.top;
+        
+        
+        var col = getCol(clientX-startx);
+        var row = getRow(clientY-starty);
+
+        console.log(col+","+row);
+
+        //Get the row
+        var rowElement = $('.gantt-row[row='+row+']');
+
+        //Get the col
+        var colElement = undefined;
+        if(rowElement!=undefined){
+            colElement = rowElement.find('.gantt-cell[col='+col+']');        
+        }
+
+        //Handle cell edge scrolling here
+        //Edge scrolling needs to be done vert and horz at the same time
+        //Check if the edge needs to be scrolled
+        var scrolledCell = handleCellScroll(colElement.length!=0,rowElement.length!=0,col,row);
+        col = scrolledCell[0];
+        row = scrolledCell[1];
+        console.log(col+","+row);
+
         endHighlight.col = col;
         endHighlight.row = row;
+
 
         //If the mouse is near an edge scroll
         //scrollToCell(col,row);
         refreshCellHighlight();
+    }
+
+    function handleCellScroll(colExists,rowExists,colVal,rowVal){
+        if(cellScrolling){
+            return [endHighlight.col,endHighlight.row];
+        }
+        console.log(colExists+","+rowExists)
+        if(colExists&&rowExists){
+            return [colVal,rowVal];
+        }
+        cellScrolling = true;
+        
+        var tempColVal = endHighlight.col;
+        var tempRowVal = endHighlight.row;
+        var tempRow = $('.gantt-row[row='+tempRowVal+']');
+
+        //Check row
+        if(!rowExists){
+            //Check direction
+            if(rowVal==-1){
+                //up
+                tempRowVal--;
+            }
+            else if(rowVal==10000){
+                //down
+                tempRowVal++;
+            }
+            else{
+                console.error(rowVal);
+            }
+            tempRow = $('.gantt-row[row='+tempRowVal+']');
+            //If this row doesn't exist, revert to endHighlight
+            if(tempRow.length==0){                //revert
+                tempRow = endHighlight.row;
+            }
+        }
+
+        //Check col
+        if(!colExists){
+            //check direction
+            if(colVal==-1){
+                //left
+                tempColVal--;
+            }
+            else if(colVal==10000){
+                //right
+                tempColVal++;
+            }
+            else{
+                console.error(colVal);
+            }
+            var tempCol = tempRow.find('.gantt-cell[col='+tempColVal+']');
+            //If this col doesn't exist, revert to endHighlight
+            if(tempCol.length==0){                //revert
+                tempCol = endHighlight.col;
+            }
+
+        }
+        setTimeout(function(){
+            cellScrolling = false;
+        },700);
+        return [tempColVal,tempRowVal];
     }
 }
 
 function getCol(offsetX){
     //Check lower bound
     if(offsetX<0){
-        return 0;
+        return -1;
     }
 
     //Check upper bound
     var width = $('#gantt_cell_wrapper').outerWidth();
     if(offsetX>width){
-        //Later I will make this scroll the thing
-        return 6;
+        //The mouse if outside of the box, need to scroll it(Only move it every .7 seconds)
+        return 10000;
     }
     
+    //Get the scroll offset
     var leftScroll = $('#gantt_cell_wrapper').scrollLeft();
     var col = 6;
     var total = leftScroll+offsetX;
@@ -77,20 +171,20 @@ function getCol(offsetX){
 function getRow(offsetY){
     //Check lower bound
     if(offsetY<0){
-        return 0;
+        return -1;
     }
 
     //Check upper bound
-    var height = $('#gantt_cell_wrapper').outerHeight();
+    var height = $('#gantt_cell_wrapper').outerHeight()-$('.gantt-row-header').outerHeight();//Minus header
     if(offsetY>height){
         //Later I will make this scroll the thing
-        return 41;
+        return 10000;
     }
     
     var topScroll = $('#gantt_cell_wrapper').scrollTop();
     var row = 41;
     var total = topScroll+offsetY;
-    $('.gantt-row').each(function(key,element){
+    $('.gantt-row').not('.gantt-row-header').each(function(key,element){
         total -= $(element).outerHeight();
         if(total<=0){
             row = $(element).attr('row');
@@ -102,6 +196,8 @@ function getRow(offsetY){
 
 function scrollToCell(col,row){
     console.log("Scrolling to "+col+","+row);
+    //For now just handle x movement
+    //Investigate pointer lock, need a way to detect where to scroll if the mouse is off window
 }
 
 function activateCell(col,row){
@@ -214,11 +310,13 @@ function refreshCellHighlight(){
     var col2 = endHighlight.col;
     var row1 = parseInt(startHighlight.row)+1;
     var row2 = parseInt(endHighlight.row)+1;
+    console.log(col1+","+col2);
 
     var lowerCol = Math.min(col1,col2);
     var higherCol = Math.max(col1,col2);
     var lowerRow = Math.min(row1,row2);
     var higherRow = Math.max(row1,row2);
+    
 
     //Create CSS Selection
     var selection = "";

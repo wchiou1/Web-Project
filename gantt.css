@@ -59,6 +59,7 @@
     background: rgba(255,0,0,.2);
     width: 1px;
     height: 10000px;
+    margin-top: 3px;
     position: absolute;
 }
 #gantt_chart .gantt-bar{

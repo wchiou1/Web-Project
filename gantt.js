@@ -110,7 +110,7 @@ function appendDay(){
     var sunday = (future_date.getUTCDay()==0?"gantt-cell-white-separator":"");
     var saturday = (future_date.getUTCDay()==6?"gantt-cell-white-separator":"");
     //Add the day to the header
-    $('.gantt-chart-row-header').append(`<div class="gantt-chart-cell-header `+sunday+` table-cell" date="`+dateToInput(future_date)+`" style="min-width:`+gantt_chart_cell_width+`px;">`+week_day+`</div>`);
+    $('.gantt-chart-row-header').append(`<div class="gantt-chart-cell-header table-cell" date="`+dateToInput(future_date)+`" style="min-width:`+gantt_chart_cell_width+`px;">`+week_day+`</div>`);
     $('.gantt-chart-row-body').append(`<div class="gantt-chart-cell-body `+saturday+` `+weekend+` table-cell" date="`+dateToInput(future_date)+`" style="width:5px;"></div>`);
     //Increment future by one
     future_date = future_date.addDays(1);
@@ -124,7 +124,7 @@ function prependDay(){
     var sunday = (past_date.getUTCDay()==0?"gantt-cell-white-separator":"");
     var saturday = (past_date.getUTCDay()==6?"gantt-cell-white-separator":"");
     //Add the day to the header
-    $('.gantt-chart-row-header').prepend(`<div class="gantt-chart-cell-header `+sunday+` table-cell" date="`+dateToInput(past_date)+`" style="min-width:`+gantt_chart_cell_width+`px;">`+week_day+`</div>`);
+    $('.gantt-chart-row-header').prepend(`<div class="gantt-chart-cell-header table-cell" date="`+dateToInput(past_date)+`" style="min-width:`+gantt_chart_cell_width+`px;">`+week_day+`</div>`);
     $('.gantt-chart-row-body').prepend(`<div class="gantt-chart-cell-body `+saturday+` `+weekend+` table-cell" date="`+dateToInput(past_date)+`" style="width:5px;"></div>`);
     //Decrement past by one
     past_date = past_date.addDays(-1);

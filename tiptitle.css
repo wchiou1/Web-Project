@@ -1,0 +1,7 @@
+#tiptitleWrapper{
+  position: absolute;
+  background: lightblue;
+  border: 1px solid black;
+  padding: 2px;
+  z-index: 1000;
+}

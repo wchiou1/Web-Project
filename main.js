@@ -18,6 +18,7 @@ $(function(){
     initResize();
     initExcelEvents();
 	initTipTitles();
+    initUploadEvent();
     
 });
 
@@ -258,6 +259,9 @@ function activateCell(col,row){
             console.log(cell.find('input').val());
         }
     }
+}
+function getCellInput(col,row){
+    return $('.gantt-row[row='+row+'] .gantt-cell[col='+col+'] input');
 }
 function handleCellUp(){
     //If the same cell is highlighted, activate it
@@ -522,4 +526,123 @@ function setCell(row,type,val){
     }
     var dur_input = cell.find('input');
     dur_input.val(val);
+}
+function setCellFromCoords(row,col,val){
+    var cell = $('.gantt-row[row='+row+'] .gantt-cell[col='+col+']');
+    if(cell.length==0){
+        console.error("Unable to find cell "+row+"-"+col);
+        return;
+    }
+    if(cell.find('input').length==0){
+        activateCell(col,row);
+    }
+    var dur_input = cell.find('input');
+    dur_input.val(val);
+}
+
+function exportToCSV(){
+    //Potential edge-cases
+    //Do we want to get blank rows? YES
+    //How do we determine if we've gotten all the data?
+    //For now, just take all of it
+
+    //Output the headers
+    var csv_output = '"I","Task Mode","Task Name","Duration","Start","Finish","PreReq"\n';
+    
+    //Get the rows
+    //length first
+    let rows_num = $('.gantt-row[row]').length-1;//Remove one, cause we don't need the headers
+    for(let i=0;i<=rows_num;i++){
+        let row_dom = $('.gantt-row[row='+i+']');
+        let row_text = "";
+
+        //iterate through the cells
+        for(let j=0;j<=6;j++){
+            //attempt to get cell text
+            let cell_dom = $(row_dom).find('.gantt-cell[col='+j+']');
+            let cell_text = cell_dom.textContent;
+            if(cell_text==undefined){
+                cell_text = '';
+            }
+            if(cell_text.length==0){
+                //attempt to get an input
+                let cell_input = cell_dom.find('input');
+                if(cell_input.length!=0){
+                    cell_text = '"'+cell_input.val()+'"';
+                }
+            }
+            row_text += cell_text+',';
+        }
+        row_text = row_text.slice(0,-1);//Remove the extra comma
+        row_text += "\n";
+        csv_output += row_text;
+    }
+    return csv_output;
+
+}
+
+function downloadCSV(){
+    downloadFile(exportToCSV(), 'csv_export.csv', 'text/csv;charset=utf-8;');
+}
+
+//AI
+function downloadFile(content, fileName, contentType) {
+  // 1. Create a Blob with the data and the exact mime-type
+  const blob = new Blob([content], { type: contentType });
+  
+  // 2. Generate a temporary localized URL pointing to the Blob object
+  const url = URL.createObjectURL(blob);
+  
+  // 3. Construct an invisible <a> tag
+  const dummyAnchor = document.createElement('a');
+  dummyAnchor.href = url;
+  dummyAnchor.download = fileName; // Sets the target file name
+  
+  // 4. Force a click event to prompt the browser download dialog
+  dummyAnchor.click();
+  
+  // 5. Clean up system memory by releasing the object URL
+  URL.revokeObjectURL(url);
+}
+
+//AI
+function initUploadEvent(){
+    document.getElementById('csvFileInput').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const text = e.target.result;
+            const data = parseCSV(text);
+            console.log(data); // Array of arrays or objects
+            csvToCells(data);
+        };
+
+        reader.readAsText(file);
+
+        //AI
+        function parseCSV(text) {
+            const lines = text.split('\n');
+            return lines.map(line => line.split(','));
+        }
+    });
+}
+
+//Read the data and put it in the cells
+function csvToCells(data){
+    //iterate through the data
+    //Remove the first array
+    data.forEach((array, csv_row) => {
+        let row = csv_row+1;
+        if(csv_row==0)
+            return;
+        array.forEach((text,col) => {
+            console.log(row+"-"+col+":"+text);
+            let result = text.replaceAll('"','');
+            setCellFromCoords(row-2,col,result);
+        });
+        updateGanttBar(row-2);
+    });
 }

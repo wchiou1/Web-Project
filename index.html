@@ -13,11 +13,20 @@
   <link href="gantt.css" rel="stylesheet">
   <link href="jquery-ui.min.css" rel="stylesheet">
   <link href="tiptitle.css" rel="stylesheet">
+  <link href="assets/fontawesome/css/fontawesome.css" rel="stylesheet">
+  <link href="assets/fontawesome/css/brands.css" rel="stylesheet">
+  <link href="assets/fontawesome/css/solid.css" rel="stylesheet">
 
   </head>
 
   <body>
     <div id="main_background" class="localtable">
+      <div class="baseAbsolute" style="pointer-events: none">
+        <div style="position: absolute;width: 20px;height: 20px;background: white;top: 10px;/*! z-index: 20; */left: 10px;cursor: pointer;border: 1px solid black;pointer-events: visible;">
+          <!--<div class="fa-solid fa-upload"></div>-->
+          <input type="file" id="csvFileInput" accept=".csv" />
+        </div>
+      </div>
       <div id="timeline_row" class="table-row">
         <div class="localtable">
           <div id="timeline_box"></div>

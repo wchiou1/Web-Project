@@ -32,8 +32,11 @@ function updateGanttBar(row){
     var days = daysDiff(start,end);
     var length = (days+1)*gantt_chart_cell_width;
 
+	//Get text
+	var bar_text = cell_row.find('.gantt-taskname input').val();
+
     //Create the bar
-    var bar = $(`<div class="gantt-bar" row="`+row+`"></div>`);
+    var bar = $(`<div class="gantt-bar" tip-title="`+bar_text+`" row="`+row+`"></div>`);
     bar.css("width",length+"px");
 
     
@@ -68,7 +71,8 @@ function fillInGanttChart(){
         $("#gantt_chart_body").append(`<div class="gantt-chart-row-body table-row" row=`+i+` style="height:`+defaultHeight+`px"></div>`);
     }
     
-    for(var i=0;i<12;i++){
+    //fill in an entire year
+    for(var i=0;i<52;i++){
         appendWeek();
     }
 
